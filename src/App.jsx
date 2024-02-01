@@ -22,7 +22,9 @@ const App = () => {
   // const [numberVerifiedCulverts, setNumberVerifiedCulverts] = useState(0);
   const [isFileLoaded, setFileLoaded] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState('');
-  const [covertetData, setConvertedData] = useState('')
+  const [isFileChecked, setFileChecked] = useState(false);
+  const [checkedFileName,setCheckedFileName] = useState('')
+  const [covertedData, setConvertedData] = useState('')
 
   let dataArr = [];
   let uniqGnggaStringsArr = [];
@@ -79,6 +81,8 @@ const App = () => {
 
     console.log(totalDataArr);
     setConvertedData(totalDataArr)
+    setFileChecked(true)
+    setCheckedFileName(loadedFileName)
   };
 
   //очистка содержимого
@@ -105,19 +109,7 @@ const App = () => {
     reader.readAsText(file);
   };
 
-  // let sendData = () => {
-  //   navigator
-  //     .share({
-  //       title: `123`,
-  //       text: `${JSON.stringify(inputValue)}`,
-  //     })
-  //     .then(() => {
-  //       console.log('список труб отправлен');
-  //     })
-  //     .catch((err) => {
-  //       console.log('что-то пошло не так');
-  //     });
-  // };
+
 
   function writeFile(name, value) {
     let val = value
@@ -136,9 +128,24 @@ const App = () => {
 
   let downloadData = () => {
     console.log('download');
-    // console.log(JSON.stringify(covertetData));
-    writeFile(prompt('введите имя файла'), `${JSON.stringify(covertetData)}`)
+
+    // let jsonConvertedData = 
+    writeFile(prompt('введите имя файла'), `${JSON.stringify(covertedData)}`)
   }
+
+  let downloadTrack = () => {
+    console.log('download track');
+    let convertedTrack =''
+    covertedData.forEach((e)=>{
+      let pointCoord = e.pointLatitude + ';' + e.pointLongtitude + '\n'
+      
+      // convertedTrack.push(pointCoord)
+      convertedTrack +=pointCoord
+    })
+    console.log(convertedTrack);
+    writeFile('gpsTrack', convertedTrack)
+  }
+
 
   return (
     <>
@@ -185,16 +192,9 @@ const App = () => {
             >
               проверить данные
             </button>
-
-            {/* <button
-              className='btn btn-warning m-2 border-secondary'
-              id='func-buttons'
-              type='button'
-              onClick={sendData}
-            >
-              отправить данные
-            </button> */}
-
+            {isFileChecked && (
+              <div className='font-weight-bold'>проверен {checkedFileName}</div>
+            )}
             <button
               className='btn btn-info m-2 border-secondary'
               type='button'
@@ -212,6 +212,16 @@ const App = () => {
             >
               скачать обработанный файл
             </button>
+
+            <button
+              className='btn btn-success m-2 border-secondary'
+              id='func-buttons'
+              type='button'
+              onClick={downloadTrack}
+            >
+              скачать обработанный трек
+            </button>
+
 
             {/* <InfoBlock /> */}
           </div>

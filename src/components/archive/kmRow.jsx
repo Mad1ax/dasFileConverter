@@ -1,5 +1,5 @@
 import React from "react";
-import KmCeil from "../kmCeil";
+import KmCeil from "../../kmCeil";
 
 const KmRow = ({ currentRow }) => {
   // console.log('asd', Math.round(total.length/20));

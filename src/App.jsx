@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { getDistance } from 'geolib';
-import _ from 'lodash';
+// import { getDistance } from 'geolib';
+// import _ from 'lodash';
 
-import TableRow from './components/tableRow';
-import TableHead from './components/tableHead';
-import KmRow from './components/kmRow';
-import InfoBlock from './components/infoBlock';
+// import TableRow from './components/tableRow';
+// import TableHead from './components/tableHead';
+// import KmRow from './components/kmRow';
+// import InfoBlock from './components/infoBlock';
 
 //загрузка тогоже файла
 //loader
@@ -23,8 +23,8 @@ const App = () => {
   const [isFileLoaded, setFileLoaded] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState('');
   const [isFileChecked, setFileChecked] = useState(false);
-  const [checkedFileName,setCheckedFileName] = useState('')
-  const [covertedData, setConvertedData] = useState('')
+  const [checkedFileName, setCheckedFileName] = useState('');
+  const [covertedData, setConvertedData] = useState('');
 
   let dataArr = [];
   let uniqGnggaStringsArr = [];
@@ -66,10 +66,8 @@ const App = () => {
       let currentLong = iteratedString[4].toString();
       let longA = currentLong.slice(0, 3);
       let longB = currentLong.slice(3, 5);
-      let longC = (Number(currentLong.slice(6,10)) * 0.006).toFixed(1);
+      let longC = (Number(currentLong.slice(6, 10)) * 0.006).toFixed(1);
       let finallong = longA + ' ' + longB + ' ' + longC;
-
-
 
       currentStringObject = {
         pointTime: currentTime,
@@ -80,16 +78,17 @@ const App = () => {
     });
 
     console.log(totalDataArr);
-    setConvertedData(totalDataArr)
-    setFileChecked(true)
-    setCheckedFileName(loadedFileName)
+    setConvertedData(totalDataArr);
+    setFileChecked(true);
+    setCheckedFileName(loadedFileName);
   };
 
   //очистка содержимого
   const inputClear = () => {
     setInputValue('');
-    setConvertedData('')
+    setConvertedData('');
     setFileLoaded(false);
+    setCheckedFileName(false);
     console.log('data cleared');
   };
 
@@ -109,49 +108,46 @@ const App = () => {
     reader.readAsText(file);
   };
 
-
-
   function writeFile(name, value) {
-    let val = value
+    let val = value;
     if (value === undefined) {
-        val = ""
+      val = '';
     }
-    const download = document.createElement("a")
-    download.href = "data:text/plain;content-disposition=attachment;filename=file," + val
-    download.download = name
-    download.style.display = "none"
-    download.id = "download"
-    document.body.appendChild(download)
-    document.getElementById("download").click()
-    document.body.removeChild(download)
-}
+    const download = document.createElement('a');
+    download.href =
+      'data:text/plain;content-disposition=attachment;filename=file,' + val;
+    download.download = name;
+    download.style.display = 'none';
+    download.id = 'download';
+    document.body.appendChild(download);
+    document.getElementById('download').click();
+    document.body.removeChild(download);
+  }
 
   let downloadData = () => {
     console.log('download');
 
-    // let jsonConvertedData = 
-    writeFile(prompt('введите имя файла'), `${JSON.stringify(covertedData)}`)
-  }
+    // let jsonConvertedData =
+    writeFile(prompt('введите имя файла'), `${JSON.stringify(covertedData)}`);
+  };
 
   let downloadTrack = () => {
     console.log('download track');
-    let convertedTrack =''
-    covertedData.forEach((e)=>{
-      let pointCoord = e.pointLatitude + ';' + e.pointLongtitude + '\n'
-      
-      // convertedTrack.push(pointCoord)
-      convertedTrack +=pointCoord
-    })
-    console.log(convertedTrack);
-    writeFile('gpsTrack', convertedTrack)
-  }
+    let convertedTrack = '';
+    covertedData.forEach((e) => {
+      let pointCoord = e.pointLatitude + ';' + e.pointLongtitude + '\n';
 
+      // convertedTrack.push(pointCoord)
+      convertedTrack += pointCoord;
+    });
+    console.log(convertedTrack);
+    let downloadedTrackFileName = loadedFileName.split('.')[0] + ' track';
+    writeFile(downloadedTrackFileName, convertedTrack);
+  };
 
   return (
     <>
-      <h1 className='m-2 border-bottom text-center'>
-        Конвертер .das файлов
-      </h1>
+      <h1 className='m-2 border-bottom text-center'>Конвертер .das файлов</h1>
       <form action='' id='form'>
         <div className='inputContainer p-2'>
           <textarea
@@ -221,7 +217,6 @@ const App = () => {
             >
               скачать обработанный трек
             </button>
-
 
             {/* <InfoBlock /> */}
           </div>

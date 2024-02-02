@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LeafletMap from './components/map';
 // import { getDistance } from 'geolib';
 // import _ from 'lodash';
 
@@ -24,7 +25,8 @@ const App = () => {
   const [loadedFileName, setLoadedFileName] = useState('');
   const [isFileChecked, setFileChecked] = useState(false);
   const [checkedFileName, setCheckedFileName] = useState('');
-  const [covertedData, setConvertedData] = useState('');
+  const [convertedData, setConvertedData] = useState('');
+  const [markerData,setMarkerData] = useState([])
 
   let dataArr = [];
   let uniqGnggaStringsArr = [];
@@ -58,16 +60,29 @@ const App = () => {
 
       //lat, long
       let currentLat = iteratedString[2].toString();
+      // console.log(currentLat);
+      // let latA = currentLat.slice(0, 2);
+      // let latB = currentLat.slice(2, 4);
+      // let latC = (Number(currentLat.slice(5, 9)) * 0.006).toFixed(1);
+      // let finalLat = latA + ' ' + latB + ' ' + latC;
+
+
       let latA = currentLat.slice(0, 2);
-      let latB = currentLat.slice(2, 4);
-      let latC = (Number(currentLat.slice(5, 9)) * 0.006).toFixed(1);
-      let finalLat = latA + ' ' + latB + ' ' + latC;
+      let latB = Number(currentLat.slice(2, 9))/60;
+      let finalLat = (+latA + latB).toFixed(6).toString();
+      // console.log(finalLat);
+
+
       // console.log(latA,latB,latC);
       let currentLong = iteratedString[4].toString();
-      let longA = currentLong.slice(0, 3);
-      let longB = currentLong.slice(3, 5);
-      let longC = (Number(currentLong.slice(6, 10)) * 0.006).toFixed(1);
-      let finallong = longA + ' ' + longB + ' ' + longC;
+      let longA = Number(currentLong.slice(0, 3));
+      let longB = Number(currentLong.slice(3, 10))/60;
+      // let longC = (Number(currentLong.slice(6, 10)) * 0.006).toFixed(1);
+      // console.log(longA);
+
+      let finallong = (+longA+longB).toFixed(6).toString();
+
+      // console.log(longA,longB,finallong);
 
       currentStringObject = {
         pointTime: currentTime,
@@ -88,13 +103,13 @@ const App = () => {
     setInputValue('');
     setConvertedData('');
     setFileLoaded(false);
-    setCheckedFileName(false);
+    setFileChecked(false);
     console.log('data cleared');
   };
 
   //загрузка текстового файла
   const fileLoader = (event) => {
-    setFileLoaded(true);
+ 
     let file = event.target.files[0];
     let reader = new FileReader();
     reader.onload = function (event) {
@@ -106,6 +121,7 @@ const App = () => {
     console.log('загружаю файл', file.name);
     setLoadedFileName(file.name);
     reader.readAsText(file);
+    setFileLoaded(true);
   };
 
   function writeFile(name, value) {
@@ -126,15 +142,13 @@ const App = () => {
 
   let downloadData = () => {
     console.log('download');
-
-    // let jsonConvertedData =
-    writeFile(prompt('введите имя файла'), `${JSON.stringify(covertedData)}`);
+    writeFile(prompt('введите имя файла'), `${JSON.stringify(convertedData)}`);
   };
 
   let downloadTrack = () => {
     console.log('download track');
     let convertedTrack = '';
-    covertedData.forEach((e) => {
+    convertedData.forEach((e) => {
       let pointCoord = e.pointLatitude + ';' + e.pointLongtitude + '\n';
 
       // convertedTrack.push(pointCoord)
@@ -144,10 +158,27 @@ const App = () => {
     let downloadedTrackFileName = loadedFileName.split('.')[0] + ' track';
     writeFile(downloadedTrackFileName, convertedTrack);
   };
+  
+  let showOnMap =()=>{
+    let markers=[]
+    let markerObject = {}
+    if (convertedData.length>0) {
+      convertedData.forEach((e) => {
+        markerObject = {
+          geocode: [e.pointLatitude, e.pointLongtitude],
+          popup: e.pointLatitude + ' ' + e.pointLongtitude,
+        }
+        markers.push(markerObject)
+      });
+    }
+    setMarkerData(markers);
+  }
 
   return (
     <>
+    <div className='marginedContainer'>
       <h1 className='m-2 border-bottom text-center'>Конвертер .das файлов</h1>
+      </div>
       <form action='' id='form'>
         <div className='inputContainer p-2'>
           <textarea
@@ -201,12 +232,22 @@ const App = () => {
             </button>
 
             <button
+              className='btn btn-warning m-2 border-secondary'
+              id='func-buttons'
+              type='button'
+              onClick={showOnMap}
+            >
+              отобразить на карте
+            </button>
+
+
+            <button
               className='btn btn-success m-2 border-secondary'
               id='func-buttons'
               type='button'
               onClick={downloadData}
             >
-              скачать обработанный файл
+              скачать файл
             </button>
 
             <button
@@ -215,13 +256,16 @@ const App = () => {
               type='button'
               onClick={downloadTrack}
             >
-              скачать обработанный трек
+              скачать трек
             </button>
 
             {/* <InfoBlock /> */}
           </div>
         </div>
       </form>
+
+      <LeafletMap markerData={markerData}/>
+      
     </>
   );
 };

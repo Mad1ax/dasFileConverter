@@ -130,3 +130,29 @@ textarea::placeholder {
 	#infoContainer {
 		width: 200px;
 	}
+
+	.marginedContainer {
+		margin-left: 40px;
+	}
+
+
+
+	/* .mapContainer {
+		width: 300px;
+		height: 300px;
+		border: 2px solid red;
+	} */
+
+
+	.leaflet-container {
+		/* height: 40%;
+		width: 300px; */
+		/* border: 2px solid red; */
+		/* margin: 2%; */
+	}
+
+	/* .leaflet-map {
+		height: 50%;
+		width: 50%;
+		
+	}  */

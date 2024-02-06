@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
+// import markerIcon from 'leaflet/dist/images/marker-icon.png';
 
-const LeafletMap = ({ markerData }) => {
-  const [markers, setMarkers] = useState([]);
+const LeafletMap = ({ markers, markerCenter }) => {
 
-  //   const markers = [
-  //     { geocode: [56.468156, 84.983309], popup: 'marker1',},
-  //     { geocode: [56.471944, 84.983265], popup: 'marker2' },
-  //     { geocode: [56.466213, 84.959924], popup: 'marker3' },
-  //     { geocode: [56.091639, 38.852167], popup: 'marker4' },
-  //   ];
-
-//   setMarkers(markerData)
+  
+  function ChangeView({ center, zoom }) {
+    const map = useMap();
+    map.setView(center, zoom);
+    return null;
+  }
 
   const customIcon = new Icon({
     // iconUrl: markerIcon,
@@ -22,7 +19,6 @@ const LeafletMap = ({ markerData }) => {
     iconSize: [32, 32],
   });
 
-  //   'https://cdn-icons-png.flaticon.com/32/5591/5591266.png'
 
   return (
     <div
@@ -36,27 +32,21 @@ const LeafletMap = ({ markerData }) => {
     >
       <MapContainer
         style={{ height: '100%', width: '100%' }}
-        center={[56.466525, 84.982564]}
-        zoom={13}
+        center={markerCenter.center}
+        zoom={markerCenter.zoom}
         scrollWheelZoom={true}
       >
+        <ChangeView center={markerCenter.center} zoom={markerCenter.zoom} /> 
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
 
-
         {markers.map((marker) => (
-          <Marker
-            position={marker.geocode}
-            icon={customIcon}
-            key={marker.geocode}
-          >
+          <Marker key={marker.key} position={marker.geocode} icon={customIcon}>
             <Popup>{marker.popup}</Popup>
           </Marker>
         ))}
-
-
       </MapContainer>
     </div>
   );

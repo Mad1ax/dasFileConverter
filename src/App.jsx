@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import LeafletMap from './components/map';
+// import { indexOf } from 'lodash';
 // import { getDistance } from 'geolib';
 // import _ from 'lodash';
 
@@ -27,6 +28,7 @@ const App = () => {
   const [checkedFileName, setCheckedFileName] = useState('');
   const [convertedData, setConvertedData] = useState('');
   const [markerData,setMarkerData] = useState([])
+  const [mapContainerSettings, setMapContainerSettings]=useState({center:[56.483975, 84.956919],zoom:13,})
 
   let dataArr = [];
   let uniqGnggaStringsArr = [];
@@ -92,7 +94,7 @@ const App = () => {
       totalDataArr.push(currentStringObject);
     });
 
-    console.log(totalDataArr);
+    console.log('проверяемый массив данных',totalDataArr);
     setConvertedData(totalDataArr);
     setFileChecked(true);
     setCheckedFileName(loadedFileName);
@@ -104,7 +106,9 @@ const App = () => {
     setConvertedData('');
     setFileLoaded(false);
     setFileChecked(false);
-    console.log('data cleared');
+    setMarkerData([])
+    setMapContainerSettings({center:[56.483975, 84.956919],zoom:13,})
+    console.log('данные очищены');
   };
 
   //загрузка текстового файла
@@ -143,6 +147,7 @@ const App = () => {
   let downloadData = () => {
     console.log('download');
     writeFile(prompt('введите имя файла'), `${JSON.stringify(convertedData)}`);
+    console.log('файл скачан');
   };
 
   let downloadTrack = () => {
@@ -154,24 +159,36 @@ const App = () => {
       // convertedTrack.push(pointCoord)
       convertedTrack += pointCoord;
     });
-    console.log(convertedTrack);
+    // console.log(convertedTrack);
     let downloadedTrackFileName = loadedFileName.split('.')[0] + ' track';
     writeFile(downloadedTrackFileName, convertedTrack);
   };
   
-  let showOnMap =()=>{
+  const showOnMap =()=>{
     let markers=[]
     let markerObject = {}
     if (convertedData.length>0) {
       convertedData.forEach((e) => {
         markerObject = {
-          geocode: [e.pointLatitude, e.pointLongtitude],
+          geocode: [Number(e.pointLatitude), Number(e.pointLongtitude)],
           popup: e.pointLatitude + ' ' + e.pointLongtitude,
+          key: e.pointTime,
         }
         markers.push(markerObject)
       });
     }
     setMarkerData(markers);
+    console.log('маркеры отображены');
+
+    // let currentMapCenter = markers[markers.length/2].geocode
+    // console.log('geocent',currentMapCenter.geocode);
+
+    // {center:[56.483975, 84.956919],zoom:13,}
+
+    setMapContainerSettings({center:markers[markers.length/2].geocode,zoom:14,})
+    // console.log('geocent',markers[markers.length/2].geocode,'zoom',);
+
+    // console.log(markerData);
   }
 
   return (
@@ -236,6 +253,7 @@ const App = () => {
               id='func-buttons'
               type='button'
               onClick={showOnMap}
+              
             >
               отобразить на карте
             </button>
@@ -247,7 +265,7 @@ const App = () => {
               type='button'
               onClick={downloadData}
             >
-              скачать файл
+              скачать файл с временем
             </button>
 
             <button
@@ -264,7 +282,7 @@ const App = () => {
         </div>
       </form>
 
-      <LeafletMap markerData={markerData}/>
+      <LeafletMap markers={markerData} markerCenter={mapContainerSettings}/>
       
     </>
   );
